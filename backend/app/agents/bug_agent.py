@@ -1,21 +1,31 @@
-from backend.app.models.parser_result import ParserResult
 from backend.app.models.bug_report import BugReport
+from backend.app.models.finding import Finding
 
 
 class BugAgent:
 
-    def find_bugs(self, parser_result: ParserResult) -> BugReport:
-
-        bugs = []
+    def find_bugs(self, parser_result):
 
         code = parser_result.code
 
-        # Rule 1: Division by zero
-        if "/0" in code or "/ 0" in code:
-            bugs.append("Possible division by zero.")
+        findings = []
+
+        # Division by zero
+        if "/ 0" in code or "/0" in code:
+
+            findings.append(
+                Finding(
+                    agent="BugAgent",
+                    category="Bug",
+                    severity="High",
+                    title="Division by Zero",
+                    explanation="The code performs integer division using zero as the divisor. In Java, this throws an ArithmeticException at runtime.",
+                    recommendation="Validate the divisor before performing the division."
+                )
+            )
 
         return BugReport(
-            has_bugs=len(bugs) > 0,
-            bug_count=len(bugs),
-            bugs=bugs
+            has_bugs=len(findings) > 0,
+            bug_count=len(findings),
+            findings=findings
         )
