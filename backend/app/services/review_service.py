@@ -24,26 +24,10 @@ class ReviewService:
         # Step 3: Detect security issues
         security_report = self.security_agent.scan(parser_result)
 
-        # ---------------------------------------------------------
-        # Temporary compatibility layer
-        # LLMAgent still expects bug_report.bugs (list[str])
-        # while BugAgent now returns findings (ReviewFinding objects).
-        # We'll remove this after updating LLMAgent.
-        # ---------------------------------------------------------
-
-        bug_report_for_llm = type(
-            "BugReportForLLM",
-            (),
-            {
-                "has_bugs": bug_report.has_bugs,
-                "bugs": [finding.title for finding in bug_report.findings]
-            }
-        )()
-
         # Step 4: Generate AI explanation
         ai_review = self.llm.explain(
             parser_result,
-            bug_report_for_llm,
+            bug_report,
             security_report
         )
 

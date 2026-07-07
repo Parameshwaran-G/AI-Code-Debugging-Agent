@@ -16,10 +16,16 @@ class LLMAgent:
         findings = []
 
         if bug_report.has_bugs:
-            findings.extend(bug_report.bugs)
+            findings.extend(
+                finding.title
+                for finding in bug_report.findings
+            )
 
         if security_report.has_security_issues:
-            findings.extend(security_report.issues)
+            findings.extend(
+                finding.title
+                for finding in security_report.findings
+            )
 
         # No findings -> No need to call the LLM
         if not findings:

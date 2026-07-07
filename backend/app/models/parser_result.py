@@ -8,4 +8,11 @@ class ParserResult(BaseModel):
     language: str
     syntax_valid: bool
     errors: list[str]
+
+    # Internal object used by other agents.
+    # Excluded from API responses.
     ast: Any | None = None
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }

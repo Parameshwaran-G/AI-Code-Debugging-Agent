@@ -1,3 +1,5 @@
+import ast
+
 from backend.app.models.parser_result import ParserResult
 
 
@@ -7,12 +9,25 @@ class ParserAgent:
 
         language = self.detect_language(code)
 
+        syntax_valid = True
+        errors = []
+        tree = None
+
+        if language == "python":
+
+            try:
+                tree = ast.parse(code)
+
+            except SyntaxError as e:
+                syntax_valid = False
+                errors.append(str(e))
+
         return ParserResult(
             code=code,
             language=language,
-            syntax_valid=True,
-            errors=[],
-            ast=None
+            syntax_valid=syntax_valid,
+            errors=errors,
+            ast=tree
         )
 
     def detect_language(self, code: str):
