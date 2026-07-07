@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ParserResult(BaseModel):
@@ -9,10 +9,7 @@ class ParserResult(BaseModel):
     syntax_valid: bool
     errors: list[str]
 
-    # Internal object used by other agents.
-    # Excluded from API responses.
-    ast: Any | None = None
-
-    model_config = {
-        "arbitrary_types_allowed": True
-    }
+    # Internal AST used by analysis agents.
+    # It is excluded from API responses because ast.Module
+    # cannot be serialized to JSON.
+    ast: Any | None = Field(default=None, exclude=True)
