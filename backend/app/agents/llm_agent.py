@@ -91,6 +91,10 @@ Return ONLY valid JSON.
 
             content = response.json()["response"].strip()
 
+            print("\n========== RAW OLLAMA RESPONSE ==========")
+            print(content)
+            print("=========================================\n")
+
             review = json.loads(content)
 
             defaults = {

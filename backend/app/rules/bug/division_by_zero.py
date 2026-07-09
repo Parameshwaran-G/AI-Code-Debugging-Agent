@@ -31,7 +31,9 @@ class DivisionByZeroRule(BaseRule):
                         severity="High",
                         title="Division by Zero",
                         explanation="The code performs division using zero.",
-                        recommendation="Validate the divisor before performing division."
+                        recommendation="Validate the divisor before division.",
+                        line=node.lineno,
+                        column=node.col_offset,
                     )
                 )
 

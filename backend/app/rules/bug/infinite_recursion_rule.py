@@ -17,31 +17,36 @@ class InfiniteRecursionRule(BaseRule):
 
         for node in ast.walk(tree):
 
-            if not isinstance(node, ast.FunctionDef):
-                continue
+            if isinstance(node, ast.FunctionDef):
 
-            function_name = node.name
+                function_name = node.name
 
-            for child in ast.walk(node):
+                for child in ast.walk(node):
 
-                if (
-                    isinstance(child, ast.Call)
-                    and isinstance(child.func, ast.Name)
-                    and child.func.id == function_name
-                ):
+                    if (
+                        isinstance(child, ast.Call)
+                        and isinstance(child.func, ast.Name)
+                        and child.func.id == function_name
+                    ):
 
-                    findings.append(
-                        Finding(
-                            agent="BugAgent",
-                            category="Bug",
-                            severity="High",
-                            title="Infinite Recursion",
-                            explanation=f"Function '{function_name}' calls itself without an obvious terminating condition.",
-                            recommendation="Add a base case before making the recursive call."
+                        findings.append(
+                            Finding(
+                                agent="BugAgent",
+                                category="Bug",
+                                severity="High",
+                                title="Infinite Recursion",
+                                explanation=(
+                                    f"Function '{function_name}' calls itself "
+                                    "without an obvious terminating condition."
+                                ),
+                                recommendation=(
+                                    "Add a base case before making the recursive call."
+                                ),
+                                line=child.lineno,
+                                column=child.col_offset,
+                            )
                         )
-                    )
 
-                    # Prevent duplicate findings for the same function
-                    break
+                        break
 
         return findings
