@@ -6,6 +6,12 @@ from backend.app.rules.base_rule import BaseRule
 
 class EvalUsageRule(BaseRule):
 
+    RULE_ID = "SEC003"
+    TITLE = "Dangerous use of eval()"
+    CATEGORY = "Security"
+    SEVERITY = "Medium"
+    TAGS = ["security", "code-injection"]
+
     def check(self, parser_result):
 
         findings = []
@@ -25,12 +31,17 @@ class EvalUsageRule(BaseRule):
 
                 findings.append(
                     Finding(
+                        rule_id=self.RULE_ID,
                         agent="SecurityAgent",
-                        category="Security",
-                        severity="Medium",
-                        title="Dangerous use of eval()",
+                        category=self.CATEGORY,
+                        severity=self.SEVERITY,
+                        title=self.TITLE,
                         explanation="eval() executes arbitrary Python code and can lead to code injection.",
-                        recommendation="Avoid eval() on untrusted input."
+                        recommendation="Avoid eval() on untrusted input.",
+                        line=node.lineno,
+                        column=node.col_offset,
+                        confidence=100,
+                        tags=self.TAGS,
                     )
                 )
 

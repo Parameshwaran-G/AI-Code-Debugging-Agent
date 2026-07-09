@@ -12,20 +12,21 @@ class LLMAgent:
 
     def explain(self, parser_result, bug_report, security_report):
 
-        # Collect all findings
         findings = bug_report.findings + security_report.findings
 
-        # No findings -> No LLM call needed
         if not findings:
             return LLMReview(
                 summary="No issues detected.",
                 severity="None",
-                explanation="ParserAgent, BugAgent and SecurityAgent did not detect any issues.",
+                explanation=(
+                    "ParserAgent, BugAgent and SecurityAgent did not detect any issues."
+                ),
                 fix="No changes are required.",
-                best_practice="Continue following clean coding practices and write unit tests."
+                best_practice=(
+                    "Continue following clean coding practices and write unit tests."
+                )
             )
 
-        # Determine highest severity from rule engine
         severity_order = {
             "Low": 1,
             "Medium": 2,
@@ -35,35 +36,70 @@ class LLMAgent:
         highest_severity = "Low"
 
         for finding in findings:
-            if severity_order.get(finding.severity, 0) > severity_order.get(highest_severity, 0):
+            if (
+                severity_order.get(finding.severity, 0)
+                > severity_order.get(highest_severity, 0)
+            ):
                 highest_severity = finding.severity
 
-        findings_text = "\n".join(
-            f"- {finding.title}" for finding in findings
-        )
+        findings_text = ""
+
+        for index, finding in enumerate(findings, start=1):
+
+            findings_text += f"""
+Issue {index}
+
+Rule ID: {finding.rule_id}
+Title: {finding.title}
+Category: {finding.category}
+Severity: {finding.severity}
+
+Location:
+Line: {finding.line}
+Column: {finding.column}
+
+Confidence: {finding.confidence}%
+
+Tags:
+{", ".join(finding.tags)}
+
+Explanation:
+{finding.explanation}
+
+Recommendation:
+{finding.recommendation}
+
+----------------------------------------
+"""
 
         prompt = f"""
-You are a senior software engineer.
+You are an expert Python static code analysis assistant.
 
-The analysis agents have already completed the review.
+The static analysis engine has already identified the issues.
+
+Your task is ONLY to explain the reported findings.
 
 Programming Language:
 {parser_result.language}
 
 Detected Findings:
+
 {findings_text}
 
 Source Code:
+
 {parser_result.code}
 
-IMPORTANT:
+STRICT RULES:
 
-- Explain ONLY the detected findings.
-- Do NOT detect new bugs.
-- Do NOT invent security issues.
-- Do NOT assign severity.
-- Do NOT perform another code review.
-- Keep the explanation concise.
+1. Explain ONLY the detected findings.
+2. Do NOT detect additional bugs or security issues.
+3. Do NOT rewrite the user's source code.
+4. Do NOT invent variable names.
+5. Do NOT provide fixes using the user's variables.
+6. Give generic fixes that apply to similar code.
+7. Keep the explanation concise and professional.
+8. If multiple findings exist, summarize them together.
 
 Return ONLY valid JSON.
 
@@ -116,12 +152,18 @@ Return ONLY valid JSON.
                 best_practice=review["best_practice"]
             )
 
-        except (requests.RequestException, json.JSONDecodeError, KeyError) as e:
+        except (
+            requests.RequestException,
+            json.JSONDecodeError,
+            KeyError
+        ) as e:
 
             return LLMReview(
                 summary="LLM Error",
                 severity=highest_severity,
                 explanation=f"Failed to generate AI review: {str(e)}",
                 fix="Verify Ollama is running and returning valid JSON.",
-                best_practice="Always validate responses received from external AI services."
+                best_practice=(
+                    "Always validate responses received from external AI services."
+                )
             )

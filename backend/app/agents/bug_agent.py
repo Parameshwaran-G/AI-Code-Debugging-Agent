@@ -2,6 +2,7 @@ from backend.app.models.bug_report import BugReport
 
 from backend.app.rules.bug.division_by_zero import DivisionByZeroRule
 from backend.app.rules.bug.infinite_recursion_rule import InfiniteRecursionRule
+from backend.app.rules.bug.unreachable_code_rule import UnreachableCodeRule
 
 
 class BugAgent:
@@ -11,6 +12,7 @@ class BugAgent:
         self.rules = [
             DivisionByZeroRule(),
             InfiniteRecursionRule(),
+            UnreachableCodeRule(),
         ]
 
     def find_bugs(self, parser_result):

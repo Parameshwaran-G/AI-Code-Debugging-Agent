@@ -6,6 +6,12 @@ from backend.app.rules.base_rule import BaseRule
 
 class HardcodedApiKeyRule(BaseRule):
 
+    RULE_ID = "SEC002"
+    TITLE = "Hardcoded API Key"
+    CATEGORY = "Security"
+    SEVERITY = "High"
+    TAGS = ["security", "api-key"]
+
     def check(self, parser_result):
 
         findings = []
@@ -31,12 +37,17 @@ class HardcodedApiKeyRule(BaseRule):
 
                     findings.append(
                         Finding(
+                            rule_id=self.RULE_ID,
                             agent="SecurityAgent",
-                            category="Security",
-                            severity="High",
-                            title="Hardcoded API Key",
+                            category=self.CATEGORY,
+                            severity=self.SEVERITY,
+                            title=self.TITLE,
                             explanation="API keys should never be stored directly in source code.",
-                            recommendation="Move API keys to environment variables."
+                            recommendation="Move API keys to environment variables.",
+                            line=node.lineno,
+                            column=node.col_offset,
+                            confidence=100,
+                            tags=self.TAGS,
                         )
                     )
 

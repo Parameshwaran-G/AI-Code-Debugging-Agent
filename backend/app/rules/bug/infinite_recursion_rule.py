@@ -6,6 +6,12 @@ from backend.app.rules.base_rule import BaseRule
 
 class InfiniteRecursionRule(BaseRule):
 
+    RULE_ID = "BUG002"
+    TITLE = "Infinite Recursion"
+    CATEGORY = "Bug"
+    SEVERITY = "High"
+    TAGS = ["bug", "recursion"]
+
     def check(self, parser_result):
 
         findings = []
@@ -31,19 +37,20 @@ class InfiniteRecursionRule(BaseRule):
 
                         findings.append(
                             Finding(
+                                rule_id=self.RULE_ID,
                                 agent="BugAgent",
-                                category="Bug",
-                                severity="High",
-                                title="Infinite Recursion",
+                                category=self.CATEGORY,
+                                severity=self.SEVERITY,
+                                title=self.TITLE,
                                 explanation=(
                                     f"Function '{function_name}' calls itself "
                                     "without an obvious terminating condition."
                                 ),
-                                recommendation=(
-                                    "Add a base case before making the recursive call."
-                                ),
+                                recommendation="Add a base case before making the recursive call.",
                                 line=child.lineno,
                                 column=child.col_offset,
+                                confidence=100,
+                                tags=self.TAGS,
                             )
                         )
 

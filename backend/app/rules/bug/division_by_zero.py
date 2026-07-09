@@ -6,6 +6,12 @@ from backend.app.rules.base_rule import BaseRule
 
 class DivisionByZeroRule(BaseRule):
 
+    RULE_ID = "BUG001"
+    TITLE = "Division by Zero"
+    CATEGORY = "Bug"
+    SEVERITY = "High"
+    TAGS = ["bug", "arithmetic"]
+
     def check(self, parser_result):
 
         findings = []
@@ -26,14 +32,17 @@ class DivisionByZeroRule(BaseRule):
 
                 findings.append(
                     Finding(
+                        rule_id=self.RULE_ID,
                         agent="BugAgent",
-                        category="Bug",
-                        severity="High",
-                        title="Division by Zero",
+                        category=self.CATEGORY,
+                        severity=self.SEVERITY,
+                        title=self.TITLE,
                         explanation="The code performs division using zero.",
                         recommendation="Validate the divisor before division.",
                         line=node.lineno,
                         column=node.col_offset,
+                        confidence=100,
+                        tags=self.TAGS,
                     )
                 )
 
