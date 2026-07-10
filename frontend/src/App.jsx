@@ -1,6 +1,11 @@
 import { useState } from "react";
 import api from "./services/api";
 
+import SummaryCards from "./components/SummaryCards.jsx";
+import ParserCard from "./components/ParserCard.jsx";
+import FindingCard from "./components/FindingCard.jsx";
+import AIReview from "./components/AIReview.jsx";
+
 function App() {
 
   const [code, setCode] = useState(`def f():
@@ -40,13 +45,17 @@ f()`);
 
     <div className="min-h-screen bg-gray-100 p-8">
 
-      <h1 className="text-4xl font-bold text-center mb-8">
+      <h1 className="text-4xl font-bold text-center">
         AI Code Debugging Agent
       </h1>
 
+      <p className="text-center text-gray-600 mb-8">
+        Rule-Based Static Analysis + AI Review
+      </p>
+
       <div className="grid grid-cols-2 gap-6">
 
-        {/* Left */}
+        {/* Left Panel */}
 
         <div>
 
@@ -66,140 +75,32 @@ f()`);
 
         </div>
 
-        {/* Right */}
+        {/* Right Panel */}
 
         <div className="space-y-5">
 
-          <div className="bg-white rounded-lg shadow p-5">
+          {result && (
 
-            <h2 className="text-xl font-bold mb-2">
-              Parser
-            </h2>
+            <>
+              <SummaryCards result={result} />
 
-            {result && (
+              <ParserCard parser={result.parser} />
 
-              <>
-                <p>
-                  <b>Language:</b> {result.parser.language}
-                </p>
+              <FindingCard
+                title="Bug Findings"
+                findings={result.bugs.findings}
+              />
 
-                <p>
-                  <b>Syntax:</b>{" "}
-                  {result.parser.syntax_valid ? "Valid" : "Invalid"}
-                </p>
+              <FindingCard
+                title="Security Findings"
+                findings={result.security.findings}
+              />
 
-              </>
+              <AIReview review={result.ai_review} />
 
-            )}
+            </>
 
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-5">
-
-            <h2 className="text-xl font-bold mb-2">
-              Bug Findings
-            </h2>
-
-            {result?.bugs.findings.length === 0 && (
-              <p>No Bugs Found</p>
-            )}
-
-            {result?.bugs.findings.map((bug, index) => (
-
-              <div key={index} className="mb-5">
-
-                <h3 className="font-bold text-red-600">
-                  {bug.title}
-                </h3>
-
-                <p>{bug.explanation}</p>
-
-                <p className="mt-2 text-green-700">
-                  {bug.recommendation}
-                </p>
-
-              </div>
-
-            ))}
-
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-5">
-
-            <h2 className="text-xl font-bold mb-2">
-              Security Findings
-            </h2>
-
-            {result?.security.findings.length === 0 && (
-              <p>No Security Issues</p>
-            )}
-
-            {result?.security.findings.map((issue, index) => (
-
-              <div key={index} className="mb-5">
-
-                <h3 className="font-bold text-red-600">
-                  {issue.title}
-                </h3>
-
-                <p>{issue.explanation}</p>
-
-                <p className="mt-2 text-green-700">
-                  {issue.recommendation}
-                </p>
-
-              </div>
-
-            ))}
-
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-5">
-
-            <h2 className="text-xl font-bold mb-2">
-              AI Review
-            </h2>
-
-            {result && (
-
-              <>
-                <p><b>Summary:</b> {result.ai_review.summary}</p>
-
-                <br />
-
-                <p>
-                  <b>Severity:</b> {result.ai_review.severity}
-                </p>
-
-                <br />
-
-                <p>
-                  <b>Explanation:</b>
-                </p>
-
-                <p>{result.ai_review.explanation}</p>
-
-                <br />
-
-                <p>
-                  <b>Fix:</b>
-                </p>
-
-                <p>{result.ai_review.fix}</p>
-
-                <br />
-
-                <p>
-                  <b>Best Practice:</b>
-                </p>
-
-                <p>{result.ai_review.best_practice}</p>
-
-              </>
-
-            )}
-
-          </div>
+          )}
 
         </div>
 
